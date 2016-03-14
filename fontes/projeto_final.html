@@ -47,6 +47,19 @@
 		margin-top:10px;
 		margin-right:5px;
       }
+	  
+	  #tipo_trajeto {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 5px 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 300px;
+		margin-top:10px;
+		margin-right:5px;
+      }
 
       #pac-input:focus {
         border-color: #4d90fe;
@@ -74,6 +87,15 @@
     <select name="lista" class="controls" ID="lista">
     <option>Selecione um local para gerar a rota</option>
     </select>
+	<br>
+	<select name="tipo_trajeto" class="controls" ID="tipo_trajeto">
+		<option value = 'DRIVING'>Selecione o tipo de trajeto</option>
+		<option value = 'DRIVING'>Carro</option>
+		<option value = 'BICYCLING'>Bike</option>
+		<option value = 'WALKING'>A pé</option>
+		<option value = 'TRANSIT'>Trasporte público</option>
+	</select>
+    
     
     <div id="map"></div>
 
@@ -88,11 +110,13 @@
             });
             var input = (document.getElementById('pac-input'));
             var lista = (document.getElementById('lista'));
-            var i;
+            var tipo_trajeto = (document.getElementById('tipo_trajeto'));
+			var i;
 
             //Colocando os inputs sobre o mapa
             map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
             map.controls[google.maps.ControlPosition.TOP_RIGHT].push(lista);
+            map.controls[google.maps.ControlPosition.TOP_RIGHT].push(tipo_trajeto);
 
             
            //Criando customização de marcador
@@ -148,12 +172,14 @@
                      var e = document.getElementById('lista');
                      e.options[e.selectedIndex].value;
 
-
+					var e2 = document.getElementById('tipo_trajeto');
+                    tipo_trajeto =  e2.options[e2.selectedIndex].value;
+					 
                       directionsService.route(
                            {
                            origin: minha_pos,
                            destination: e.options[e.selectedIndex].value,
-                           travelMode: google.maps.TravelMode.DRIVING
+                           travelMode: google.maps.TravelMode[tipo_trajeto]
                            }, 
                            function(response, status) 
                            {
@@ -168,8 +194,15 @@
                            });
                       }
 
-                     //Manda recalcular a rota, toda vez que a lista é al
+                     //Manda recalcular a rota, toda vez que a lista é alterado
                      document.getElementById('lista').addEventListener('change', function() 
+                     {
+                       calculateAndDisplayRoute(directionsService, directionsDisplay);
+                     });
+
+					 
+					  //Manda recalcular a rota, toda vez que o trajeto  é alterado
+                     document.getElementById('tipo_trajeto').addEventListener('change', function() 
                      {
                        calculateAndDisplayRoute(directionsService, directionsDisplay);
                      });
